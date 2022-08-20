@@ -3,7 +3,8 @@
 {
     public class Venta
     {
-        public int _id { get; set; }
-        public string _comentarios { get; set; }
+        public int Id { get; set; }
+        public string Comentarios { get; set; }
+        public int IdUsuario { get; set; }
     }
 }

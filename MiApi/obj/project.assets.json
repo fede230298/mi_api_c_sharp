@@ -656,11 +656,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Fede\\CoderHouse C#\\Clase API\\MiApi\\MiApi\\MiApi.csproj",
+      "projectUniqueName": "D:\\Fede\\CoderHouse C#\\Clase API\\MiApi\\mi_api_c_sharp\\MiApi\\MiApi.csproj",
       "projectName": "MiApi",
-      "projectPath": "D:\\Fede\\CoderHouse C#\\Clase API\\MiApi\\MiApi\\MiApi.csproj",
+      "projectPath": "D:\\Fede\\CoderHouse C#\\Clase API\\MiApi\\mi_api_c_sharp\\MiApi\\MiApi.csproj",
       "packagesPath": "C:\\Users\\fede2\\.nuget\\packages\\",
-      "outputPath": "D:\\Fede\\CoderHouse C#\\Clase API\\MiApi\\MiApi\\obj\\",
+      "outputPath": "D:\\Fede\\CoderHouse C#\\Clase API\\MiApi\\mi_api_c_sharp\\MiApi\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\fede2\\AppData\\Roaming\\NuGet\\NuGet.Config",

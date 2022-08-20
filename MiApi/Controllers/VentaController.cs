@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MiApi.Model;
 using MiApi.Repository;
+using MiApi.Controllers.DTOS;
 
 namespace MiApi.Controllers
 {
@@ -12,6 +13,12 @@ namespace MiApi.Controllers
         public List<Venta> GetVenta()
         {
             return VentaHandler.GetVenta();
+        }
+
+        [HttpPost]
+        public List<PostVenta> CreateVenta(List<PostVenta> DetalleVenta)
+        {
+            return VentaHandler.CreateVenta(DetalleVenta);
         }
     }
 }

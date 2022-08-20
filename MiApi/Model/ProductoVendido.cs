@@ -3,9 +3,9 @@
 {
     public class ProductoVendido
     {
-        public int _id { get; set; }
-        public int _idProducto { get; set; }
-        public int _stock { get; set; }
-        public int _idVenta { get; set; }
+        public int Id { get; set; }
+        public int IdProducto { get; set; }
+        public int Stock { get; set; }
+        public int IdVenta { get; set; }
     }
 }

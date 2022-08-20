@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "nzAC/lT23yPfmPmAzbijwTfdTxIPwEIPhNd+nPrxlNiaw5RLF5TBvFJsEfM0vOyOgBakcByPBbTUU3hkjoShqA==",
+  "dgSpecHash": "sst2kWVJ3+K2E/59YnoJLnlh4R1q5ieMJcewD5MYpR9YVwrGf1Y1J/E4aFTiv20i0qthnQXc0KlWrQ0iNB9QgA==",
   "success": true,
-  "projectFilePath": "D:\\Fede\\CoderHouse C#\\Clase API\\MiApi\\MiApi\\MiApi.csproj",
+  "projectFilePath": "D:\\Fede\\CoderHouse C#\\Clase API\\MiApi\\mi_api_c_sharp\\MiApi\\MiApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\fede2\\.nuget\\packages\\microsoft.extensions.apidescription.server\\3.0.0\\microsoft.extensions.apidescription.server.3.0.0.nupkg.sha512",
     "C:\\Users\\fede2\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",

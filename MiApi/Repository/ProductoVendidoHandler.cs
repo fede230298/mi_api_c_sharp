@@ -28,10 +28,10 @@ namespace MiApi.Repository
                             while (dataReader.Read())
                             {
                                 ProductoVendido productoVendido = new ProductoVendido();
-                                productoVendido._id = Convert.ToInt32(dataReader["Id"]);
-                                productoVendido._idProducto = Convert.ToInt32(dataReader["IdProducto"]);
-                                productoVendido._stock = Convert.ToInt32(dataReader["Stock"]);
-                                productoVendido._idVenta = Convert.ToInt32(dataReader["IdVenta"]);
+                                productoVendido.Id = Convert.ToInt32(dataReader["Id"]);
+                                productoVendido.IdProducto = Convert.ToInt32(dataReader["IdProducto"]);
+                                productoVendido.Stock = Convert.ToInt32(dataReader["Stock"]);
+                                productoVendido.IdVenta = Convert.ToInt32(dataReader["IdVenta"]);
 
                                 resultado.Add(productoVendido);
                             }
