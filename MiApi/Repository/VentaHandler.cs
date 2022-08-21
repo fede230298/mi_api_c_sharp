@@ -53,12 +53,12 @@ namespace MiApi.Repository
         }
         public static List<PostVenta> CreateVenta(List<PostVenta> DetalleVenta)
         {
-            DataTable dtProductos = new DataTable();
-            DataTable dtUsuarios = new DataTable();
+            DataTable tablaProducto = new DataTable();
+            DataTable tablaUsuario = new DataTable();
             DataRow[] singlequery;
-            DataTable dtIdVenta = new DataTable();
+            DataTable tablaIdVenta = new DataTable();
             string query;
-            int registros_insertados = 0;
+            int registros = 0;
             int stock_producto = 0;
             int cont = -1;
 
@@ -66,7 +66,7 @@ namespace MiApi.Repository
             {
                 SqlDataAdapter SqlAdapter = new SqlDataAdapter("SELECT Id, Stock FROM Producto", sqlConnection);
                 sqlConnection.Open();
-                SqlAdapter.Fill(dtProductos);
+                SqlAdapter.Fill(tablaProducto);
                 sqlConnection.Close();
             }
 
@@ -74,7 +74,7 @@ namespace MiApi.Repository
             {
                 SqlDataAdapter SqlAdapter = new SqlDataAdapter("SELECT Id FROM Usuario", sqlConnection);
                 sqlConnection.Open();
-                SqlAdapter.Fill(dtUsuarios);
+                SqlAdapter.Fill(tablaUsuario);
                 sqlConnection.Close();
             }
 
@@ -82,7 +82,7 @@ namespace MiApi.Repository
             {
                 cont++;
                 query = "Id = " + VentaProducto.IdProducto.ToString();
-                singlequery = dtProductos.Select(query);
+                singlequery = tablaProducto.Select(query);
                 stock_producto = Convert.ToInt32(singlequery[0].ItemArray[1]) - VentaProducto.Stock;
 
                 try
@@ -91,22 +91,31 @@ namespace MiApi.Repository
                     {
                         string QueryUpdate = "INSERT INTO Venta ( [Comentarios], [IdUsuario] ) VALUES ( @Comentarios, @IdUsuario )";
 
-                        SqlParameter param_Comentarios = new SqlParameter("Comentarios", SqlDbType.VarChar) { Value = DateTime.Now };
-                        SqlParameter param_IdUsuario = new SqlParameter("IdUsuario", SqlDbType.BigInt) { Value = VentaProducto.IdUsuario };
+
+                        SqlParameter parametroComentarios = new SqlParameter();
+                        parametroComentarios.ParameterName = "Comentarios";
+                        parametroComentarios.SqlDbType = System.Data.SqlDbType.VarChar;
+                        parametroComentarios.Value = DateTime.Now;
+
+
+                        SqlParameter parametroIdUsuario = new SqlParameter();
+                        parametroIdUsuario.ParameterName = "IdUsuario";
+                        parametroIdUsuario.SqlDbType = System.Data.SqlDbType.BigInt;
+                        parametroIdUsuario.Value = VentaProducto.IdUsuario;
 
                         sqlConnection.Open();
                         using (SqlCommand sqlCommand = new SqlCommand(QueryUpdate, sqlConnection))
                         {
-                            sqlCommand.Parameters.Add(param_Comentarios);
-                            sqlCommand.Parameters.Add(param_IdUsuario);
-                            registros_insertados = sqlCommand.ExecuteNonQuery();
+                            sqlCommand.Parameters.Add(parametroComentarios);
+                            sqlCommand.Parameters.Add(parametroIdUsuario);
+                            registros = sqlCommand.ExecuteNonQuery();
                         }
-                        if (registros_insertados > 0)
+                        if (registros > 0)
                         {
                             using (SqlConnection sqlConnection_id = new SqlConnection(ConnectionString))
                             {
                                 SqlDataAdapter SqlAdapter = new SqlDataAdapter("SELECT max(Id) FROM Venta", sqlConnection);
-                                SqlAdapter.Fill(dtIdVenta);
+                                SqlAdapter.Fill(tablaIdVenta);
                             }                        
                         }
                         sqlConnection.Close();
@@ -123,17 +132,28 @@ namespace MiApi.Repository
                     {
                         string QueryInsert = "INSERT INTO ProductoVendido ( Stock, IdProducto, IdVenta ) VALUES ( @Stock, @IdProducto, @IdVenta )";
 
-                        SqlParameter param_Stock = new SqlParameter("Stock", SqlDbType.Int) { Value = VentaProducto.Stock };
-                        SqlParameter param_IdProducto = new SqlParameter("IdProducto", SqlDbType.Int) { Value = VentaProducto.IdProducto };
-                        SqlParameter param_IdVenta = new SqlParameter("IdVenta", SqlDbType.Int) { Value = dtIdVenta.Rows[0].ItemArray[0] };
+                        SqlParameter parametroStock = new SqlParameter();
+                        parametroStock.ParameterName = "Stock";
+                        parametroStock.SqlDbType = System.Data.SqlDbType.BigInt;
+                        parametroStock.Value = VentaProducto.Stock;
+
+                        SqlParameter parametroIdProducto = new SqlParameter();
+                        parametroIdProducto.ParameterName = "IdProducto";
+                        parametroIdProducto.SqlDbType = System.Data.SqlDbType.BigInt;
+                        parametroIdProducto.Value = VentaProducto.IdProducto;
+
+                        SqlParameter parametroIdVenta = new SqlParameter();
+                        parametroIdProducto.ParameterName = "IdVenta";
+                        parametroIdProducto.SqlDbType = System.Data.SqlDbType.BigInt;
+                        parametroIdProducto.Value = tablaIdVenta.Rows[0].ItemArray[0];
 
                         sqlConnection.Open();
                         using (SqlCommand sqlCommand = new SqlCommand(QueryInsert, sqlConnection))
                         {
-                            sqlCommand.Parameters.Add(param_Stock);
-                            sqlCommand.Parameters.Add(param_IdProducto);
-                            sqlCommand.Parameters.Add(param_IdVenta);
-                            registros_insertados = sqlCommand.ExecuteNonQuery();
+                            sqlCommand.Parameters.Add(parametroStock);
+                            sqlCommand.Parameters.Add(parametroIdProducto);
+                            sqlCommand.Parameters.Add(parametroIdVenta);
+                            registros = sqlCommand.ExecuteNonQuery();
                             sqlCommand.Parameters.Clear();
                         }
                         sqlConnection.Close();
@@ -150,18 +170,21 @@ namespace MiApi.Repository
                     {
                         string QueryUpdate = "UPDATE Producto SET Stock = " + stock_producto + " WHERE Id = @IdProducto";
 
-                        SqlParameter param_IdProducto = new SqlParameter("IdProducto", SqlDbType.Int) { Value = VentaProducto.IdProducto };
+                        SqlParameter parametroIdProducto = new SqlParameter();
+                        parametroIdProducto.ParameterName = "IdProducto";
+                        parametroIdProducto.SqlDbType = System.Data.SqlDbType.BigInt;
+                        parametroIdProducto.Value = VentaProducto.IdProducto;
 
                         sqlConnection.Open();
                         using (SqlCommand sqlCommand = new SqlCommand(QueryUpdate, sqlConnection))
                         {
-                            sqlCommand.Parameters.Add(param_IdProducto);
-                            registros_insertados = sqlCommand.ExecuteNonQuery();
+                            sqlCommand.Parameters.Add(parametroIdProducto);
+                            registros = sqlCommand.ExecuteNonQuery();
                             sqlCommand.Parameters.Clear();
                         }
-                        if (registros_insertados == 1)
+                        if (registros == 1)
                         {
-                            DetalleVenta[cont].Status = "Venta Registrada - Id Venta: " + dtIdVenta.Rows[0].ItemArray[0] + " - IdUsuario: " + VentaProducto.IdUsuario;
+                            DetalleVenta[cont].Status = "Venta Registrada - Id Venta: " + tablaIdVenta.Rows[0].ItemArray[0] + " - IdUsuario: " + VentaProducto.IdUsuario;
                         }
                         sqlConnection.Close();
                     }

@@ -188,7 +188,6 @@ namespace MiApi.Repository
         }
         public static bool DeleteProducto(int Id)
         {
-            bool error = false;
             bool resultado = false;
             bool deleteProductoVendido = false;
             bool deleteProducto = false;
