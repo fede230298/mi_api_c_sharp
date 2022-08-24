@@ -20,5 +20,10 @@ namespace MiApi.Controllers
         {
             return VentaHandler.CreateVenta(DetalleVenta);
         }
+        [HttpDelete]
+        public bool DeleteVenta(int idVenta)
+        {
+            return VentaHandler.DeleteVenta(idVenta);
+        }
     }
 }

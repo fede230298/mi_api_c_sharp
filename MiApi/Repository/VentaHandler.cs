@@ -143,9 +143,9 @@ namespace MiApi.Repository
                         parametroIdProducto.Value = VentaProducto.IdProducto;
 
                         SqlParameter parametroIdVenta = new SqlParameter();
-                        parametroIdProducto.ParameterName = "IdVenta";
-                        parametroIdProducto.SqlDbType = System.Data.SqlDbType.BigInt;
-                        parametroIdProducto.Value = tablaIdVenta.Rows[0].ItemArray[0];
+                        parametroIdVenta.ParameterName = "IdVenta";
+                        parametroIdVenta.SqlDbType = System.Data.SqlDbType.BigInt;
+                        parametroIdVenta.Value = tablaIdVenta.Rows[0].ItemArray[0];
 
                         sqlConnection.Open();
                         using (SqlCommand sqlCommand = new SqlCommand(QueryInsert, sqlConnection))
@@ -195,6 +195,137 @@ namespace MiApi.Repository
                 }
             }
             return DetalleVenta;
+        }
+        public static bool DeleteVenta(int idVenta)
+        {
+            bool resultado = false;
+            DataTable tablaProductoVendido = new DataTable();
+            DataTable tablaProducto = new DataTable();
+            DataRow[] singlequeryVenta;
+            DataRow[] singlequeryProducto;
+            string queryVenta;
+            string queryProducto;
+            int registros = 0;
+            int addStock = 0;
+
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {
+                SqlDataAdapter SqlAdapter = new SqlDataAdapter("SELECT * FROM ProductoVendido", sqlConnection);
+                sqlConnection.Open();
+                SqlAdapter.Fill(tablaProductoVendido);
+                sqlConnection.Close();
+            }
+
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {
+                SqlDataAdapter SqlAdapter = new SqlDataAdapter("SELECT * FROM Producto", sqlConnection);
+                sqlConnection.Open();
+                SqlAdapter.Fill(tablaProducto);
+                sqlConnection.Close();
+            }
+
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+                {
+                    string QueryDeleteProductoVendido = "DELETE FROM ProductoVendido " +
+                        "WHERE IdVenta = @IdVenta";
+
+
+                    SqlParameter parametroIdVenta = new SqlParameter();
+                    parametroIdVenta.ParameterName = "IdVenta";
+                    parametroIdVenta.SqlDbType = System.Data.SqlDbType.BigInt;
+                    parametroIdVenta.Value = idVenta;
+
+                    sqlConnection.Open();
+                    using (SqlCommand sqlCommand = new SqlCommand(QueryDeleteProductoVendido, sqlConnection))
+                    {
+                        sqlCommand.Parameters.Add(parametroIdVenta);
+                        registros = sqlCommand.ExecuteNonQuery();
+                    }
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+            queryVenta = "IdVenta = " + idVenta;
+            singlequeryVenta = tablaProductoVendido.Select(queryVenta);
+            int queryIdProducto = Convert.ToInt32(singlequeryVenta[0].ItemArray[2]);
+            queryProducto = "Id = " + queryIdProducto;
+            singlequeryProducto = tablaProducto.Select(queryProducto);
+            addStock = Convert.ToInt32(singlequeryVenta[0].ItemArray[1]) + Convert.ToInt32(singlequeryProducto[0].ItemArray[4]);
+
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+                {
+                    string queryUser = "UPDATE Producto " +
+                    "SET Stock = @Stock " +
+                    "WHERE Id = @Id";
+
+                    SqlParameter parametroStock = new SqlParameter();
+                    parametroStock.ParameterName = "Stock";
+                    parametroStock.SqlDbType = System.Data.SqlDbType.BigInt;
+                    parametroStock.Value = addStock;
+
+                    SqlParameter parametroId = new SqlParameter();
+                    parametroId.ParameterName = "Id";
+                    parametroId.SqlDbType = System.Data.SqlDbType.BigInt;
+                    parametroId.Value = queryIdProducto;
+
+                    sqlConnection.Open();
+
+                    using (SqlCommand sqlCommand = new SqlCommand(queryUser, sqlConnection))
+                    {
+                        sqlCommand.Parameters.Add(parametroStock);
+                        sqlCommand.Parameters.Add(parametroId);
+
+                        int numberOfRows = sqlCommand.ExecuteNonQuery();
+
+                        sqlConnection.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+                {
+                    string queryUser = "DELETE FROM Venta " +
+                    "WHERE Id = @Id";
+
+                    SqlParameter parametroId = new SqlParameter();
+                    parametroId.ParameterName = "Id";
+                    parametroId.SqlDbType = System.Data.SqlDbType.BigInt;
+                    parametroId.Value = idVenta;
+
+                    sqlConnection.Open();
+
+                    using (SqlCommand sqlCommand = new SqlCommand(queryUser, sqlConnection))
+                    {
+                        sqlCommand.Parameters.Add(parametroId);
+
+                        int numberOfRows = sqlCommand.ExecuteNonQuery();
+                        if(numberOfRows > 0)
+                        {
+                            resultado = true;
+                        }
+                        sqlConnection.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            return resultado;
         }
     }
 }
