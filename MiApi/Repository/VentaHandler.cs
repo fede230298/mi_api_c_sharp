@@ -210,7 +210,7 @@ namespace MiApi.Repository
 
             using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
             {
-                SqlDataAdapter SqlAdapter = new SqlDataAdapter("SELECT * FROM ProductoVendido", sqlConnection);
+                SqlDataAdapter SqlAdapter = new SqlDataAdapter("SELECT * FROM ProductoVendido WHERE IdVenta = " + idVenta, sqlConnection);
                 sqlConnection.Open();
                 SqlAdapter.Fill(tablaProductoVendido);
                 sqlConnection.Close();
@@ -223,108 +223,120 @@ namespace MiApi.Repository
                 SqlAdapter.Fill(tablaProducto);
                 sqlConnection.Close();
             }
-
-            try
+           
+            
+            for(int i = 0; i < tablaProductoVendido.Rows.Count; i++)
             {
-                using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+                addStock = 0;
+                queryVenta = "IdVenta = " + idVenta;
+                singlequeryVenta = tablaProductoVendido.Select(queryVenta);
+                int queryIdProducto = Convert.ToInt32(singlequeryVenta[i].ItemArray[2]);
+                queryProducto = "Id = " + queryIdProducto;
+                singlequeryProducto = tablaProducto.Select(queryProducto);
+                addStock = Convert.ToInt32(singlequeryVenta[i].ItemArray[1]) + Convert.ToInt32(singlequeryProducto[0].ItemArray[4]);
+
+                try
                 {
-                    string QueryDeleteProductoVendido = "DELETE FROM ProductoVendido " +
-                        "WHERE IdVenta = @IdVenta";
-
-
-                    SqlParameter parametroIdVenta = new SqlParameter();
-                    parametroIdVenta.ParameterName = "IdVenta";
-                    parametroIdVenta.SqlDbType = System.Data.SqlDbType.BigInt;
-                    parametroIdVenta.Value = idVenta;
-
-                    sqlConnection.Open();
-                    using (SqlCommand sqlCommand = new SqlCommand(QueryDeleteProductoVendido, sqlConnection))
+                    using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
                     {
-                        sqlCommand.Parameters.Add(parametroIdVenta);
-                        registros = sqlCommand.ExecuteNonQuery();
-                    }
-                    sqlConnection.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+                        string QueryDeleteProductoVendido = "DELETE FROM ProductoVendido " +
+                            "WHERE IdVenta = @IdVenta AND IdProducto = @IdProducto";
 
-            queryVenta = "IdVenta = " + idVenta;
-            singlequeryVenta = tablaProductoVendido.Select(queryVenta);
-            int queryIdProducto = Convert.ToInt32(singlequeryVenta[0].ItemArray[2]);
-            queryProducto = "Id = " + queryIdProducto;
-            singlequeryProducto = tablaProducto.Select(queryProducto);
-            addStock = Convert.ToInt32(singlequeryVenta[0].ItemArray[1]) + Convert.ToInt32(singlequeryProducto[0].ItemArray[4]);
 
-            try
-            {
-                using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
-                {
-                    string queryUser = "UPDATE Producto " +
-                    "SET Stock = @Stock " +
-                    "WHERE Id = @Id";
+                        SqlParameter parametroIdVenta = new SqlParameter();
+                        parametroIdVenta.ParameterName = "IdVenta";
+                        parametroIdVenta.SqlDbType = System.Data.SqlDbType.BigInt;
+                        parametroIdVenta.Value = idVenta;
 
-                    SqlParameter parametroStock = new SqlParameter();
-                    parametroStock.ParameterName = "Stock";
-                    parametroStock.SqlDbType = System.Data.SqlDbType.BigInt;
-                    parametroStock.Value = addStock;
+                        SqlParameter parametroIdProducto = new SqlParameter();
+                        parametroIdProducto.ParameterName = "IdProducto";
+                        parametroIdProducto.SqlDbType = System.Data.SqlDbType.BigInt;
+                        parametroIdProducto.Value = queryIdProducto;
 
-                    SqlParameter parametroId = new SqlParameter();
-                    parametroId.ParameterName = "Id";
-                    parametroId.SqlDbType = System.Data.SqlDbType.BigInt;
-                    parametroId.Value = queryIdProducto;
-
-                    sqlConnection.Open();
-
-                    using (SqlCommand sqlCommand = new SqlCommand(queryUser, sqlConnection))
-                    {
-                        sqlCommand.Parameters.Add(parametroStock);
-                        sqlCommand.Parameters.Add(parametroId);
-
-                        int numberOfRows = sqlCommand.ExecuteNonQuery();
-
-                        sqlConnection.Close();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-
-            try
-            {
-                using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
-                {
-                    string queryUser = "DELETE FROM Venta " +
-                    "WHERE Id = @Id";
-
-                    SqlParameter parametroId = new SqlParameter();
-                    parametroId.ParameterName = "Id";
-                    parametroId.SqlDbType = System.Data.SqlDbType.BigInt;
-                    parametroId.Value = idVenta;
-
-                    sqlConnection.Open();
-
-                    using (SqlCommand sqlCommand = new SqlCommand(queryUser, sqlConnection))
-                    {
-                        sqlCommand.Parameters.Add(parametroId);
-
-                        int numberOfRows = sqlCommand.ExecuteNonQuery();
-                        if(numberOfRows > 0)
+                        sqlConnection.Open();
+                        using (SqlCommand sqlCommand = new SqlCommand(QueryDeleteProductoVendido, sqlConnection))
                         {
-                            resultado = true;
+                            sqlCommand.Parameters.Add(parametroIdVenta);
+                            sqlCommand.Parameters.Add(parametroIdProducto);
+                            registros = sqlCommand.ExecuteNonQuery();
                         }
                         sqlConnection.Close();
                     }
                 }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+
+                try
+                {
+                    using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+                    {
+                        string queryUser = "UPDATE Producto " +
+                        "SET Stock = @Stock " +
+                        "WHERE Id = @Id";
+
+                        SqlParameter parametroStock = new SqlParameter();
+                        parametroStock.ParameterName = "Stock";
+                        parametroStock.SqlDbType = System.Data.SqlDbType.BigInt;
+                        parametroStock.Value = addStock;
+
+                        SqlParameter parametroId = new SqlParameter();
+                        parametroId.ParameterName = "Id";
+                        parametroId.SqlDbType = System.Data.SqlDbType.BigInt;
+                        parametroId.Value = queryIdProducto;
+
+                        sqlConnection.Open();
+
+                        using (SqlCommand sqlCommand = new SqlCommand(queryUser, sqlConnection))
+                        {
+                            sqlCommand.Parameters.Add(parametroStock);
+                            sqlCommand.Parameters.Add(parametroId);
+
+                            int numberOfRows = sqlCommand.ExecuteNonQuery();
+
+                            sqlConnection.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+
+                try
+                {
+                    using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+                    {
+                        string queryUser = "DELETE FROM Venta " +
+                        "WHERE Id = @Id";
+
+                        SqlParameter parametroId = new SqlParameter();
+                        parametroId.ParameterName = "Id";
+                        parametroId.SqlDbType = System.Data.SqlDbType.BigInt;
+                        parametroId.Value = idVenta;
+
+                        sqlConnection.Open();
+
+                        using (SqlCommand sqlCommand = new SqlCommand(queryUser, sqlConnection))
+                        {
+                            sqlCommand.Parameters.Add(parametroId);
+
+                            int numberOfRows = sqlCommand.ExecuteNonQuery();
+                            if(numberOfRows > 0)
+                            {
+                                resultado = true;
+                            }
+                            sqlConnection.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
             }
-            catch (Exception ex)
-            {
-                return false;
-            }
+
             return resultado;
         }
     }
